@@ -1,14 +1,16 @@
-﻿using Dominio.Context.Entidades.Seguridad;
+﻿using Dominio.Context.Entidades.Mensaje;
+using Dominio.Context.Entidades.Seguridad;
 using Dominio.Core;
+using Infraestructura.Context.Mapping.Mensaje;
 using Infraestructura.Context.Mapping.Seguridad;
 using Infraestructura.Core;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infraestructura.Context
 {
-    public class MyContext : BCUnitOfWork, IDataContext
+    public class AppDbContext : BCUnitOfWork, IDataContext
     {
-        public MyContext(DbContextOptions<MyContext> context)
+        public AppDbContext(DbContextOptions<AppDbContext> context)
             : base(context)
         {
             Database.SetCommandTimeout((int)TimeSpan.FromSeconds(1).TotalSeconds);
@@ -16,11 +18,15 @@ namespace Infraestructura.Context
 
         public virtual DbSet<Usuario> Usuarios { get; set; }
         public virtual DbSet<Rol> Rol {  get; set; }
+        public virtual DbSet<MensajeEncabezado> MensajeEncabezado { get; set; }
+        public virtual DbSet<MensajeDetalle> MensajeDetalle { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new UsuarioMap());
             modelBuilder.ApplyConfiguration(new RolMap());  
+            modelBuilder.ApplyConfiguration(new MensajeEncabezadoMap());
+            modelBuilder.ApplyConfiguration(new MensajeDetalleMap());
             base.OnModelCreating(modelBuilder);
         }
 

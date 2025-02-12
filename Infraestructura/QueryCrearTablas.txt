@@ -1,0 +1,84 @@
+﻿CREATE SCHEMA Comunes
+CREATE TABLE [Comunes].[LogTransacciones](
+	[TransaccionUId] [uniqueidentifier] NOT NULL,
+	[TipoTransaccion] [varchar](50) NOT NULL,
+	[FechaTransaccion] [datetime] NOT NULL,
+	[ModificadoPor] [varchar](25) NOT NULL,
+	[OrigenTransaccion] [varchar](50) NOT NULL
+) ON [PRIMARY]
+
+CREATE TABLE [Comunes].[LogTransaccionesDetalle](
+	[TransaccionUId] [uniqueidentifier] NOT NULL,
+	[TipoTransaccion] [varchar](50) NOT NULL,
+	[EntidadDominio] [varchar](50) NOT NULL,
+	[DescripcionTransaccion] [varchar](50) NOT NULL
+) ON [PRIMARY]
+
+CREATE TABLE [dbo].[MensajeDetalle](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[NumeroTelefono] [varchar](25) NOT NULL,
+	[TipoMensaje] [varchar](50) NOT NULL,
+	[Texto] [text] NOT NULL,
+	[FechaTransaccion] [datetime] NOT NULL,
+	[DescripcionTransaccion] [varchar](50) NOT NULL,
+	[ModificadoPor] [varchar](20) NOT NULL,
+	[TipoTransaccion] [varchar](50) NOT NULL,
+	[TransaccionUId] [uniqueidentifier] NOT NULL,
+	[RowVersion] [timestamp] NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+
+CREATE TABLE [dbo].[MensajeEncabezado](
+	[NumeroTelefono] [varchar](25) NOT NULL,
+	[Nombre] [varchar](100) NOT NULL,
+	[FechaUltimoMensajeRecibido] [datetime] NOT NULL,
+	[FechaTransaccion] [datetime] NOT NULL,
+	[DescripcionTransaccion] [varchar](50) NOT NULL,
+	[ModificadoPor] [varchar](20) NOT NULL,
+	[TipoTransaccion] [varchar](50) NOT NULL,
+	[TransaccionUId] [uniqueidentifier] NOT NULL,
+	[RowVersion] [timestamp] NOT NULL,
+ CONSTRAINT [PK_MensajeEncabezado] PRIMARY KEY CLUSTERED 
+(
+	[NumeroTelefono] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+
+
+CREATE TABLE [dbo].[MensajeEncabezado_Transacciones](
+	[UId] [int] IDENTITY(1,1) NOT NULL,
+	[NumeroTelefono] [varchar](25) NOT NULL,
+	[Nombre] [varchar](100) NOT NULL,
+	[FechaUltimoMensajeRecibido] [datetime] NOT NULL,
+	[FechaTransaccion] [datetime] NOT NULL,
+	[DescripcionTransaccion] [varchar](50) NOT NULL,
+	[ModificadoPor] [varchar](20) NOT NULL,
+	[TipoTransaccion] [varchar](50) NOT NULL,
+	[TransaccionUId] [uniqueidentifier] NOT NULL,
+	[RowVersion] [timestamp] NOT NULL,
+ CONSTRAINT [PK_MensajeEncabezado_Transacciones] PRIMARY KEY CLUSTERED 
+(
+	[UId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+
+CREATE TABLE [dbo].[MensajeDetalle_Transacciones](
+	[UId] [int] IDENTITY(1,1) NOT NULL,
+	[Id] [int] NOT NULL,
+	[NumeroTelefono] [varchar](25) NOT NULL,
+	[TipoMensaje] [varchar](50) NOT NULL,
+	[Texto] [text] NOT NULL,
+	[FechaTransaccion] [datetime] NOT NULL,
+	[DescripcionTransaccion] [varchar](50) NOT NULL,
+	[ModificadoPor] [varchar](20) NOT NULL,
+	[TipoTransaccion] [varchar](50) NOT NULL,
+	[TransaccionUId] [uniqueidentifier] NOT NULL,
+	[RowVersion] [timestamp] NOT NULL,
+ CONSTRAINT [PK_MensajeDetalle_Transacciones] PRIMARY KEY CLUSTERED 
+(
+	[UId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]

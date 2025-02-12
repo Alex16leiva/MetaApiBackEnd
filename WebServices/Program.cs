@@ -1,5 +1,6 @@
 using Aplicacion.Core;
 using Aplicacion.Services;
+using Aplicacion.Services.whatsapp;
 using Infraestructura.Context;
 using Infraestructura.Core.Jwtoken;
 using Infraestructura.Core.RestClient;
@@ -34,11 +35,11 @@ builder.Services.AddCors(options =>
 
 string conectionString = builder.Configuration.GetConnectionString("conectionDataBase");
 
-builder.Services.AddDbContext<MyContext>(
+builder.Services.AddDbContext<AppDbContext>(
         dbContextOption => dbContextOption.UseSqlServer(conectionString), ServiceLifetime.Transient
     );
 
-builder.Services.AddTransient<IDataContext, MyContext>();
+builder.Services.AddTransient<IDataContext, AppDbContext>();
 builder.Services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
 //Register Json Web Token
@@ -50,6 +51,7 @@ RestClientFactory.SetCurrent(new HttpRestClientFactory());
 //builder.Services.AddTransient<IRestClientFactory, HttpRestClientFactory>();
 
 builder.Services.AddScoped<SecurityAplicationService>();
+builder.Services.AddScoped<WhatsappAppService>();
 
 builder.Services.AddTransient<GlobalExceptionHandlingMiddleware>();
 
