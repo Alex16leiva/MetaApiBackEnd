@@ -5,6 +5,7 @@ using Infraestructura.Context;
 using Infraestructura.Core.Jwtoken;
 using Infraestructura.Core.RestClient;
 using Microsoft.EntityFrameworkCore;
+using WebServices.Controllers;
 using WebServices.Jwtoken;
 using WebServices.Middleware;
 
@@ -17,6 +18,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSignalR();
 
 builder.ConfigureJwt();
 
@@ -24,14 +26,20 @@ builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 const string AllowAllOriginsPolicy = "AllowAllOriginsPolicy";
 
+var corsPolicy = "_myCorsPolicy";
+
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(AllowAllOriginsPolicy,
-        x =>
+    options.AddPolicy(name: corsPolicy,
+        policy =>
         {
-            x.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+            policy.WithOrigins("http://localhost:5173") // Agrega tu frontend
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials(); // Importante para SignalR
         });
 });
+
 
 string conectionString = builder.Configuration.GetConnectionString("conectionDataBase");
 
@@ -64,8 +72,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors(policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
+app.UseCors(corsPolicy);
+app.MapHub<ChatHub>("/chatHub");
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
