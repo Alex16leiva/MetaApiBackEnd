@@ -3,6 +3,8 @@ using Aplicacion.Services.whatsapp;
 using Dominio.Context.Entidades.Mensaje;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Newtonsoft.Json;
+using System.Net.Http.Headers;
 using WebServices.Controllers.models;
 
 namespace WebServices.Controllers
@@ -13,13 +15,15 @@ namespace WebServices.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly WhatsappAppService _whatsappService;
-        //private readonly IHubContext<MessageHub> _hubContext;
+        private readonly IHubContext<ChatHub> _hubContext;
 
         public WebhooksController(IConfiguration configuration,
-                                    WhatsappAppService whatsappService)
+                                    WhatsappAppService whatsappService,
+                                    IHubContext<ChatHub> hubContext)
         {
             _configuration = configuration;
             _whatsappService = whatsappService;
+            _hubContext = hubContext;
         }
 
         [HttpGet]
@@ -46,9 +50,10 @@ namespace WebServices.Controllers
             {
 
                 string sender = body.Entry.First().Changes.First().Value.Contacts.First().Profile.Name;
-                string text = body.Entry.First().Changes.First().Value.Messages.First().Text.Body;
-                string phoneNumber = body.Entry.First().Changes.First().Value.Messages.First().From;
-
+                Message message = body.Entry.First().Changes.First().Value.Messages.First();
+                string text = message.Text.Body;
+                string phoneNumber = message.From;
+                    
 
 
                 var nuevoMensajeDetalle = new MensajeDetalleDTO
@@ -79,8 +84,7 @@ namespace WebServices.Controllers
                 
                 _whatsappService.CrearMensaje(request);
 
-                // Enviar el mensaje a todos los clientes conectados
-                //await _hubContext.Clients.All.SendAsync("ReceiveMessage", sender, text, phoneNumber);
+                //await ProcesarMensaje(message);
 
                 return Ok(); // Meta necesita esta respuesta
             }
@@ -89,6 +93,33 @@ namespace WebServices.Controllers
                 Console.WriteLine($"❌ Error: {ex.Message}");
                 return BadRequest();
             }
+        }
+
+        public async Task ProcesarMensaje(Message message)
+        {
+            string fileUrl = message.Type == "image" || message.Type == "video"
+                ? await ObtenerArchivoDesdeMeta(message.Id)
+                : string.Empty;
+
+            await _hubContext.Clients.All.SendAsync(
+                "ReceiveMessage", message.From, message.Text.Body, fileUrl, message.Type);
+        }
+
+        private async Task<string> ObtenerArchivoDesdeMeta(string mediaId)
+        {
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "TU_ACCESS_TOKEN");
+                var response = await client.GetAsync($"https://graph.facebook.com/v19.0/{mediaId}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    var mediaData = JsonConvert.DeserializeObject<MetaMediaResponse>(json);
+                    return mediaData.Url;
+                }
+            }
+            return string.Empty;
         }
     }
 }
