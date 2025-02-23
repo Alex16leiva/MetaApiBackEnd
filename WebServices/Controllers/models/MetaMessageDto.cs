@@ -91,4 +91,9 @@ namespace WebServices.Controllers.models
         [JsonPropertyName("body")]
         public string Body { get; set; }
     }
+
+    public class MetaMediaResponse
+    {
+        public string Url { get; set; }
+    }
 }
