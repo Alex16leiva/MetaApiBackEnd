@@ -84,7 +84,7 @@ namespace WebServices.Controllers
                 
                 _whatsappService.CrearMensaje(request);
 
-                //await ProcesarMensaje(message);
+                await ProcesarMensaje(message);
 
                 return Ok(); // Meta necesita esta respuesta
             }
@@ -95,7 +95,8 @@ namespace WebServices.Controllers
             }
         }
 
-        public async Task ProcesarMensaje(Message message)
+        
+        private async Task ProcesarMensaje(Message message)
         {
             string fileUrl = message.Type == "image" || message.Type == "video"
                 ? await ObtenerArchivoDesdeMeta(message.Id)
@@ -104,6 +105,7 @@ namespace WebServices.Controllers
             await _hubContext.Clients.All.SendAsync(
                 "ReceiveMessage", message.From, message.Text.Body, fileUrl, message.Type);
         }
+
 
         private async Task<string> ObtenerArchivoDesdeMeta(string mediaId)
         {
