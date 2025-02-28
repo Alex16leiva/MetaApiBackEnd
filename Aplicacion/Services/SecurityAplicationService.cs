@@ -1,4 +1,5 @@
 ﻿using Aplicacion.Core;
+using Aplicacion.DTOs;
 using Aplicacion.DTOs.Seguridad;
 using Aplicacion.Helpers;
 using AutoMapper;
@@ -8,6 +9,7 @@ using Dominio.Core;
 using Dominio.Core.Extensions;
 using Infraestructura.Context;
 using Infraestructura.Core.Jwtoken;
+using System.Data;
 
 namespace Aplicacion.Services
 {
@@ -16,7 +18,7 @@ namespace Aplicacion.Services
         private readonly IGenericRepository<IDataContext> _genericRepository;
         private readonly ITokenService _tokenService;
         private readonly IMapper _mapper;
-
+        private static int _idCounter = 0;
         public SecurityAplicationService(IGenericRepository<IDataContext> genericRepository, ITokenService tokenService, IMapper mapper)
         {
             _genericRepository = genericRepository;
@@ -63,9 +65,9 @@ namespace Aplicacion.Services
 
         public UsuarioDTO IniciarSesion(UserRequest request)
         {
-            List<string> includes = new List<string> { "Rol" };
+            List<string> includes = ["Rol"];
 
-            string passwordEncrypted = PasswordEncryptor.Encrypt(request.Password);
+            string passwordEncrypted = PasswordEncryptor.Encrypt(request?.Password);
 
             Usuario usuario = _genericRepository.GetSingle<Usuario>(r => r.UsuarioId == request.UsuarioId && r.Contrasena == passwordEncrypted);
 
@@ -86,6 +88,36 @@ namespace Aplicacion.Services
             {
                 Message = "Usuario o Contraseña no valido",
                 UsuarioAutenticado = false
+            };
+        }
+
+        public SearchResult<UsuarioDTO> ObtenerUsuario(GetUserRequest request)
+        {
+            var dynamicFilter = DynamicFilterFactory.CreateDynamicFilter(request.QueryInfo);
+            var usuarios = _genericRepository.GetPagedAndFiltered<Usuario>(dynamicFilter);
+            _idCounter = 0;
+            return new SearchResult<UsuarioDTO>
+            { 
+                PageCount = usuarios.PageCount,
+                ItemCount = usuarios.ItemCount,
+                TotalItems = usuarios.TotalItems,
+                PageIndex = usuarios.PageIndex,
+                Items = (from qry in usuarios.Items as IEnumerable<Usuario> select MapUsuarioDto(qry)).ToList(),
+            };
+
+        }
+
+        
+        private static UsuarioDTO MapUsuarioDto(Usuario qry)
+        {
+            return new UsuarioDTO
+            {
+                Apellido = qry.Apellido,
+                Contrasena = qry.Contrasena,
+                Nombre = qry.Nombre,
+                RolId = qry.RolId,  
+                UsuarioId = qry.UsuarioId,
+                Id = _idCounter++,
             };
         }
 

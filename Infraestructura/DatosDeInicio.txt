@@ -1,0 +1,26 @@
+﻿
+INSERT INTO [Seguridad].[Usuario]
+           ([UsuarioId]
+           ,[Nombre]
+           ,[Apellido]
+           ,[Contrasena]
+           ,[RolId]
+           ,[FechaTransaccion]
+           ,[DescripcionTransaccion]
+           ,[ModificadoPor]
+           ,[TipoTransaccion]
+           ,[TransaccionUId])
+     VALUES
+           ('Admin'
+           ,'Administrador'
+           ,'Administrador'
+           ,'03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4'
+           ,'Administrador'
+           ,GETDATE()
+           ,'Added'
+           ,'Sql'
+           ,'CargaInicial'
+           ,NEWID())
+
+
+

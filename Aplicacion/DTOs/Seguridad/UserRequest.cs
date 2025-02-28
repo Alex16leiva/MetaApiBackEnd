@@ -10,4 +10,6 @@
     {
         public UsuarioDTO? Usuario { get; set; }
     }
+
+    public class GetUserRequest : RequestBase { }
 }

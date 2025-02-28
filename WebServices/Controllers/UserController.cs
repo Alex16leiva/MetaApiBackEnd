@@ -1,4 +1,5 @@
-﻿using Aplicacion.DTOs.Seguridad;
+﻿using Aplicacion.DTOs;
+using Aplicacion.DTOs.Seguridad;
 using Aplicacion.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -27,13 +28,20 @@ namespace WebServices.Controllers
         }
 
         [Authorize]
-        [Route("")]
-        [HttpPost]
+        [HttpPost("crear-usuario")]
         public UsuarioDTO CreateUser(CreateUserRequest request)
         {
             UsuarioDTO usuario = _securityAppService.CrearUsuario(request);
 
             return usuario ;
+        }
+
+        [Authorize]
+        [HttpPost("obtener-usuarios")]
+        public SearchResult<UsuarioDTO> ObtenerUsuarios(GetUserRequest request)
+        {
+            var usuarios = _securityAppService.ObtenerUsuario(request);
+            return usuarios;
         }
     }
 }

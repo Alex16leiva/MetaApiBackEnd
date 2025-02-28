@@ -53,8 +53,6 @@ namespace WebServices.Controllers
                 Message message = body.Entry.First().Changes.First().Value.Messages.First();
                 string text = message.Text.Body;
                 string phoneNumber = message.From;
-                    
-
 
                 var nuevoMensajeDetalle = new MensajeDetalleDTO
                 {

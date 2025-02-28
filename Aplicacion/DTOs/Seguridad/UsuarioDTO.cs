@@ -12,6 +12,7 @@ namespace Aplicacion.DTOs.Seguridad
         public string? Token { get; set; }
         public bool UsuarioAutenticado { get; set; }
         public string? RolId { get; set; }
+        public int? Id { get; set; }
 
 
         public string ValidarCampos()

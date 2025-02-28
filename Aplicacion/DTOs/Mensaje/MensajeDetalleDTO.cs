@@ -6,5 +6,6 @@
         public string? NumeroTelefono { get; set; }
         public string? TipoMensaje { get; set; }
         public string? Texto { get; set; }
+        public DateTime FechaTransaccion { get; set; }
     }
 }

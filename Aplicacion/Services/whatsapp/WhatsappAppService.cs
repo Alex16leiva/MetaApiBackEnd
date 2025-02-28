@@ -33,6 +33,7 @@ namespace Aplicacion.Services.whatsapp
                 NumeroTelefono = r.NumeroTelefono,
                 Texto = r.Texto,
                 TipoMensaje = r.TipoMensaje,
+                FechaTransaccion = r.FechaTransaccion
             }).ToList();
 
             
