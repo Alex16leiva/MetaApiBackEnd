@@ -12,8 +12,7 @@ namespace Aplicacion.DTOs.Seguridad
         public string? Token { get; set; }
         public bool UsuarioAutenticado { get; set; }
         public string? RolId { get; set; }
-        public int? Id { get; set; }
-
+        public bool EditarContrasena { get; set; } = true;
 
         public string ValidarCampos()
         {
@@ -31,7 +30,7 @@ namespace Aplicacion.DTOs.Seguridad
             {
                 mensajeValidacion.AppendLine("El apellido es requerido");
             }
-            if (Contrasena.IsMissingValue())
+            if (EditarContrasena && Contrasena.IsMissingValue())
             {
                 mensajeValidacion.AppendLine("La contraña es requerida");
             }

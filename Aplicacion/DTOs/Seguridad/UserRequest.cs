@@ -6,10 +6,12 @@
         public string? Password { get; set; }
     }
 
-    public class CreateUserRequest : RequestBase
+    public class EdicionUsuarioRequest : RequestBase
     {
         public UsuarioDTO? Usuario { get; set; }
     }
 
     public class GetUserRequest : RequestBase { }
+
+    public class GetRolRequest : RequestBase { }
 }

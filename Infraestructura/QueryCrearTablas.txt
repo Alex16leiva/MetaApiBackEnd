@@ -119,3 +119,30 @@ CREATE TABLE [dbo].[MensajeDetalle_Transacciones](
 	[UId] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+
+CREATE TABLE [Seguridad].[Rol](
+	[RolId] [varchar](25) NOT NULL,
+	[Descripcion] [varchar](25) NOT NULL,
+	[FechaTransaccion] [datetime] NOT NULL,
+	[DescripcionTransaccion] [varchar](50) NOT NULL,
+	[ModificadoPor] [varchar](20) NOT NULL,
+	[RowVersion] [timestamp] NOT NULL,
+	[TipoTransaccion] [varchar](50) NOT NULL,
+	[TransaccionUId] [uniqueidentifier] NOT NULL,
+ CONSTRAINT [PK_Rol] PRIMARY KEY CLUSTERED 
+(
+	[RolId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+
+CREATE TABLE [Seguridad].[Rol_Transacciones](
+	[Uid] [int] IDENTITY(1,1) NOT NULL,
+	[RolId] [varchar](25) NOT NULL,
+	[Descripcion] [varchar](25) NOT NULL,
+	[FechaTransaccion] [datetime] NOT NULL,
+	[DescripcionTransaccion] [varchar](50) NOT NULL,
+	[ModificadoPor] [varchar](20) NOT NULL,
+	[RowVersion] [timestamp] NOT NULL,
+	[TipoTransaccion] [varchar](50) NOT NULL,
+	[TransaccionUId] [uniqueidentifier] NOT NULL
+) ON [PRIMARY]

@@ -10,6 +10,7 @@ using Dominio.Core.Extensions;
 using Infraestructura.Context;
 using Infraestructura.Core.Jwtoken;
 using System.Data;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Aplicacion.Services
 {
@@ -18,7 +19,6 @@ namespace Aplicacion.Services
         private readonly IGenericRepository<IDataContext> _genericRepository;
         private readonly ITokenService _tokenService;
         private readonly IMapper _mapper;
-        private static int _idCounter = 0;
         public SecurityAplicationService(IGenericRepository<IDataContext> genericRepository, ITokenService tokenService, IMapper mapper)
         {
             _genericRepository = genericRepository;
@@ -26,7 +26,43 @@ namespace Aplicacion.Services
             _mapper = mapper;
         }
 
-        public UsuarioDTO CrearUsuario(CreateUserRequest request)
+        public UsuarioDTO EditarUsuario(EdicionUsuarioRequest request)
+        {
+            string mensajeValidacion = request.Usuario.ValidarCampos();
+
+            if (mensajeValidacion.HasValue())
+            {
+                return new UsuarioDTO
+                {
+                    Message = request.Usuario.Message,
+                };
+            }
+
+            Usuario usuarioExiste = _genericRepository.GetSingle<Usuario>(r => r.UsuarioId == request.Usuario.UsuarioId);
+
+            if (usuarioExiste.IsNull())
+            {
+                return new UsuarioDTO
+                {
+                    Message = "El usuario no existe"
+                };
+            }
+
+            if (request.Usuario.EditarContrasena)
+            {
+                usuarioExiste.Contrasena = PasswordEncryptor.Encrypt(request.Usuario.Contrasena);
+            }
+
+            usuarioExiste.Nombre = request.Usuario.Nombre.ValueOrEmpty();
+            usuarioExiste.Apellido = request.Usuario.Apellido.ValueOrEmpty();
+            usuarioExiste.RolId = request.Usuario.RolId.ValueOrEmpty();
+
+            TransactionInfo transactionInfo = request.RequestUserInfo.CrearTransactionInfo("EditarUsuario");
+            _genericRepository.UnitOfWork.Commit(transactionInfo);
+            return new UsuarioDTO();
+        }
+
+        public UsuarioDTO CrearUsuario(EdicionUsuarioRequest request)
         {
             string mensajeValidacion = request.Usuario.ValidarCampos();
 
@@ -52,7 +88,7 @@ namespace Aplicacion.Services
             {
                 Apellido = request.Usuario.Apellido.ValueOrEmpty(),
                 Contrasena = PasswordEncryptor.Encrypt(request.Usuario.Contrasena),
-                Nombre = request.Usuario.Apellido.ValueOrEmpty(),
+                Nombre = request.Usuario.Nombre.ValueOrEmpty(),
                 RolId = request.Usuario.RolId.ValueOrEmpty(),
                 UsuarioId = request.Usuario.UsuarioId.ValueOrEmpty(),
             };
@@ -95,7 +131,7 @@ namespace Aplicacion.Services
         {
             var dynamicFilter = DynamicFilterFactory.CreateDynamicFilter(request.QueryInfo);
             var usuarios = _genericRepository.GetPagedAndFiltered<Usuario>(dynamicFilter);
-            _idCounter = 0;
+
             return new SearchResult<UsuarioDTO>
             { 
                 PageCount = usuarios.PageCount,
@@ -107,7 +143,30 @@ namespace Aplicacion.Services
 
         }
 
-        
+        public SearchResult<RolDTO> ObtenerRoles(GetRolRequest request)
+        {
+            var dynamicFilter = DynamicFilterFactory.CreateDynamicFilter(request.QueryInfo);
+            var roles = _genericRepository.GetPagedAndFiltered<Rol>(dynamicFilter);
+
+            return new SearchResult<RolDTO>
+            {
+                PageCount = roles.PageCount,
+                ItemCount = roles.ItemCount,
+                TotalItems = roles.TotalItems,
+                PageIndex = roles.PageIndex,
+                Items = (from qry in roles.Items as IEnumerable<Rol> select MapRolDto(qry)).ToList(),
+            };
+        }
+
+        private static RolDTO MapRolDto(Rol qry)
+        {
+            return new RolDTO
+            {
+                Descripcion = qry.Descripcion,
+                RolId = qry.RolId     
+            };
+        }
+
         private static UsuarioDTO MapUsuarioDto(Usuario qry)
         {
             return new UsuarioDTO
@@ -117,7 +176,7 @@ namespace Aplicacion.Services
                 Nombre = qry.Nombre,
                 RolId = qry.RolId,  
                 UsuarioId = qry.UsuarioId,
-                Id = _idCounter++,
+                FechaTransaccion = qry.FechaTransaccion,
             };
         }
 

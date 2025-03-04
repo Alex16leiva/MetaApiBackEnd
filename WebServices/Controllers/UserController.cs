@@ -29,11 +29,19 @@ namespace WebServices.Controllers
 
         [Authorize]
         [HttpPost("crear-usuario")]
-        public UsuarioDTO CreateUser(CreateUserRequest request)
+        public UsuarioDTO CreateUser(EdicionUsuarioRequest request)
         {
             UsuarioDTO usuario = _securityAppService.CrearUsuario(request);
 
             return usuario ;
+        }
+
+        [Authorize]
+        [HttpPost("editar-usuario")]
+        public UsuarioDTO EditarUsuario(EdicionUsuarioRequest request)
+        {
+            UsuarioDTO usuario = _securityAppService.EditarUsuario(request);
+            return usuario;
         }
 
         [Authorize]
@@ -42,6 +50,14 @@ namespace WebServices.Controllers
         {
             var usuarios = _securityAppService.ObtenerUsuario(request);
             return usuarios;
+        }
+
+        [Authorize]
+        [HttpPost("obtener-roles")]
+        public SearchResult<RolDTO> ObtenerRoles(GetRolRequest request)
+        {
+            var roles = _securityAppService.ObtenerRoles(request);
+            return roles;
         }
     }
 }
