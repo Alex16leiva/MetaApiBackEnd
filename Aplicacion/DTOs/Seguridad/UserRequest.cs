@@ -13,5 +13,14 @@
 
     public class GetUserRequest : RequestBase { }
 
-    public class GetRolRequest : RequestBase { }
+    public class EdicionRolRequest : RequestBase 
+    {
+        public RolDTO? Rol { get; set; }
+    }
+
+    public class EdicionPermisosRequest : RequestBase 
+    {
+        public string? RolId { get; set; }
+        public List<PermisosDTO>? Permisos { get; set; }
+    }
 }

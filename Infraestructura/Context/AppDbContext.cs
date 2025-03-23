@@ -20,13 +20,16 @@ namespace Infraestructura.Context
         public virtual DbSet<Rol> Rol {  get; set; }
         public virtual DbSet<MensajeEncabezado> MensajeEncabezado { get; set; }
         public virtual DbSet<MensajeDetalle> MensajeDetalle { get; set; }
-
+        public virtual DbSet<Pantalla> Pantalla { get; set; }
+        public virtual DbSet<Permisos> Permisos { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new UsuarioMap());
             modelBuilder.ApplyConfiguration(new RolMap());  
             modelBuilder.ApplyConfiguration(new MensajeEncabezadoMap());
             modelBuilder.ApplyConfiguration(new MensajeDetalleMap());
+            modelBuilder.ApplyConfiguration(new PantallaMap());
+            modelBuilder.ApplyConfiguration(new PermisosMap());
             base.OnModelCreating(modelBuilder);
         }
 

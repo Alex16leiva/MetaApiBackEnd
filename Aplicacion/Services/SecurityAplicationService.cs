@@ -3,12 +3,14 @@ using Aplicacion.DTOs;
 using Aplicacion.DTOs.Seguridad;
 using Aplicacion.Helpers;
 using AutoMapper;
+using Castle.Components.DictionaryAdapter.Xml;
 using Dominio.Context.Entidades;
 using Dominio.Context.Entidades.Seguridad;
 using Dominio.Core;
 using Dominio.Core.Extensions;
 using Infraestructura.Context;
 using Infraestructura.Core.Jwtoken;
+using System.Collections.Generic;
 using System.Data;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -56,10 +58,55 @@ namespace Aplicacion.Services
             usuarioExiste.Nombre = request.Usuario.Nombre.ValueOrEmpty();
             usuarioExiste.Apellido = request.Usuario.Apellido.ValueOrEmpty();
             usuarioExiste.RolId = request.Usuario.RolId.ValueOrEmpty();
+            usuarioExiste.Activo = request.Usuario.Activo;
 
             TransactionInfo transactionInfo = request.RequestUserInfo.CrearTransactionInfo("EditarUsuario");
             _genericRepository.UnitOfWork.Commit(transactionInfo);
             return new UsuarioDTO();
+        }
+
+        public List<PantallaDTO> ObtenerPantallas()
+        {
+            var pantallas = _genericRepository.GetAll<Pantalla>();
+            return pantallas.Select(r => new PantallaDTO { Descripcion = r.Descripcion, PantallaId = r.PantallaId }).ToList();
+        }
+
+        public RolDTO EdicionPermisos(EdicionPermisosRequest request)
+        {
+            var permisos = _genericRepository.GetFiltered<Permisos>(r => r.RolId == request.RolId);
+
+            foreach (var item in request.Permisos)
+            {
+                var permiso = permisos.FirstOrDefault(r => r.PantallaId == item.PantallaId);
+                if (permiso.IsNotNull())
+                {
+                    permiso.Ver = item.Ver;
+                    permiso.Editar = item.Editar;
+                    permiso.Eliminar = item.Eliminar;
+
+                    if (!permiso.Ver)
+                    {
+                        _genericRepository.Remove(permiso);
+                    }
+                }
+                else
+                {
+                    var nuevoPermiso = new Permisos
+                    {
+                        Editar = item.Editar,
+                        Eliminar = item.Eliminar,
+                        PantallaId = item.PantallaId,
+                        RolId = item.RolId,
+                        Ver = item.Ver,
+                    };
+                    _genericRepository.Add(nuevoPermiso);
+                }
+
+                
+                TransactionInfo transactionInfo = request.RequestUserInfo.CrearTransactionInfo("AgregarUsuario");
+                _genericRepository.UnitOfWork.Commit(transactionInfo);
+            }
+            return new RolDTO { };
         }
 
         public UsuarioDTO CrearUsuario(EdicionUsuarioRequest request)
@@ -91,6 +138,7 @@ namespace Aplicacion.Services
                 Nombre = request.Usuario.Nombre.ValueOrEmpty(),
                 RolId = request.Usuario.RolId.ValueOrEmpty(),
                 UsuarioId = request.Usuario.UsuarioId.ValueOrEmpty(),
+                Activo = request.Usuario.Activo
             };
             
             _genericRepository.Add(usuario);
@@ -101,11 +149,11 @@ namespace Aplicacion.Services
 
         public UsuarioDTO IniciarSesion(UserRequest request)
         {
-            List<string> includes = ["Rol"];
+            var includes = new List<string> { "Rol" };
 
             string passwordEncrypted = PasswordEncryptor.Encrypt(request?.Password);
 
-            Usuario usuario = _genericRepository.GetSingle<Usuario>(r => r.UsuarioId == request.UsuarioId && r.Contrasena == passwordEncrypted);
+            Usuario usuario = _genericRepository.GetSingle<Usuario>(r => r.UsuarioId == request.UsuarioId, includes);
 
             if (usuario.IsNotNull())
             {
@@ -143,28 +191,72 @@ namespace Aplicacion.Services
 
         }
 
-        public SearchResult<RolDTO> ObtenerRoles(GetRolRequest request)
+        public RolDTO CrearRol(EdicionRolRequest request)
         {
-            var dynamicFilter = DynamicFilterFactory.CreateDynamicFilter(request.QueryInfo);
-            var roles = _genericRepository.GetPagedAndFiltered<Rol>(dynamicFilter);
-
-            return new SearchResult<RolDTO>
+            var rol = _genericRepository.GetSingle<Rol>(r => r.RolId == request.Rol.RolId);
+            if (rol.IsNotNull())
             {
-                PageCount = roles.PageCount,
-                ItemCount = roles.ItemCount,
-                TotalItems = roles.TotalItems,
-                PageIndex = roles.PageIndex,
-                Items = (from qry in roles.Items as IEnumerable<Rol> select MapRolDto(qry)).ToList(),
+                return new RolDTO
+                {
+                    Message = $"El rol {request.Rol.RolId} ya existe"
+                };
+            }
+
+            var nuevoRol = new Rol
+            {
+                Descripcion = request.Rol.Descripcion,
+                RolId = request.Rol.RolId
             };
+
+            _genericRepository.Add(nuevoRol);
+            TransactionInfo transactionInfo = request.RequestUserInfo.CrearTransactionInfo("AgregarRol");
+            _genericRepository.UnitOfWork.Commit(transactionInfo);
+
+            return new RolDTO();
         }
 
-        private static RolDTO MapRolDto(Rol qry)
+        public RolDTO EditarRol(EdicionRolRequest request)
         {
-            return new RolDTO
+            var rol = _genericRepository.GetSingle<Rol>(r => r.RolId == request.Rol.RolId);
+
+            if (rol.IsNull())
+            {
+                return new RolDTO
+                {
+                    Message = $"El Rol {request.Rol.RolId} no existe"
+                };
+            }
+
+            rol.Descripcion = request.Rol.Descripcion;
+            TransactionInfo transactionInfo = request.RequestUserInfo.CrearTransactionInfo("EditarRol");
+            _genericRepository.UnitOfWork.Commit(transactionInfo);
+            return new RolDTO();
+        }
+
+        public List<RolDTO> ObtenerRoles()
+        {  
+            var includes = new List<string> { "Permisos" };
+            var roles = _genericRepository.GetAll<Rol>(includes);
+
+            return roles.Select(qry =>
+            new RolDTO
             {
                 Descripcion = qry.Descripcion,
-                RolId = qry.RolId     
-            };
+                RolId = qry.RolId,
+                Permisos = MapPermisosDto(qry?.Permisos),
+            }).ToList();
+        }
+
+        private static List<PermisosDTO> MapPermisosDto(List<Permisos>? permisos)
+        {
+            return permisos.Select(r => new PermisosDTO
+            {
+                Editar = r.Editar,
+                Eliminar = r.Eliminar,
+                PantallaId = r.PantallaId,
+                RolId = r.RolId,
+                Ver = r.Ver,
+            }).ToList();
         }
 
         private static UsuarioDTO MapUsuarioDto(Usuario qry)
@@ -177,6 +269,7 @@ namespace Aplicacion.Services
                 RolId = qry.RolId,  
                 UsuarioId = qry.UsuarioId,
                 FechaTransaccion = qry.FechaTransaccion,
+                Activo = qry.Activo
             };
         }
 

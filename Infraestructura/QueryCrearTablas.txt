@@ -21,6 +21,7 @@ CREATE TABLE [Seguridad].[Usuario](
 	[Apellido] [varchar](50) NOT NULL,
 	[Contrasena] [varchar](250) NOT NULL,
 	[RolId] [varchar](25) NOT NULL,
+	[Activo] [bit] NOT NULL,
 	[FechaTransaccion] [datetime] NOT NULL,
 	[DescripcionTransaccion] [varchar](50) NOT NULL,
 	[ModificadoPor] [varchar](20) NOT NULL,
@@ -40,6 +41,7 @@ CREATE TABLE [Seguridad].[Usuario_Transacciones](
 	[Apellido] [varchar](50) NOT NULL,
 	[Contrasena] [varchar](250) NOT NULL,
 	[RolId] [varchar](25) NOT NULL,
+	[Activo] [bit] NOT NULL,
 	[FechaTransaccion] [datetime] NOT NULL,
 	[DescripcionTransaccion] [varchar](50) NOT NULL,
 	[ModificadoPor] [varchar](20) NOT NULL,
@@ -145,4 +147,53 @@ CREATE TABLE [Seguridad].[Rol_Transacciones](
 	[RowVersion] [timestamp] NOT NULL,
 	[TipoTransaccion] [varchar](50) NOT NULL,
 	[TransaccionUId] [uniqueidentifier] NOT NULL
+) ON [PRIMARY]
+
+CREATE TABLE [Seguridad].[Pantalla](
+	[PantallaId] [varchar](50) NOT NULL,
+	[Descripcion] [varchar](100) NOT NULL,
+	[FechaTransaccion] [datetime] NOT NULL,
+	[DescripcionTransaccion] [varchar](50) NOT NULL,
+	[ModificadoPor] [varchar](20) NOT NULL,
+	[RowVersion] [timestamp] NOT NULL,
+	[TipoTransaccion] [varchar](50) NOT NULL,
+	[TransaccionUId] [uniqueidentifier] NOT NULL,
+ CONSTRAINT [PK_Pantalla] PRIMARY KEY CLUSTERED 
+(
+	[Pantalla] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+
+CREATE TABLE [Seguridad].[Permisos](
+	[RolId] [varchar](25) NOT NULL,
+	[PantallaId] [varchar](50) NOT NULL,
+	[Ver] [bit] NOT NULL,
+	[Editar] [bit] NOT NULL,
+	[Eliminar] [bit] NOT NULL,
+	[FechaTransaccion] [datetime] NOT NULL,
+	[DescripcionTransaccion] [varchar](50) NOT NULL,
+	[ModificadoPor] [varchar](20) NOT NULL,
+	[TipoTransaccion] [varchar](50) NOT NULL,
+	[TransaccionUId] [uniqueidentifier] NOT NULL,
+	[RowVersion] [timestamp] NOT NULL,
+ CONSTRAINT [PK_Permisos] PRIMARY KEY CLUSTERED 
+(
+	[RolId] ASC,
+	[PantallaId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+
+CREATE TABLE [Seguridad].[Permisos_Transacciones](
+	[Uid] [int] IDENTITY(1,1) NOT NULL,
+	[RolId] [varchar](25) NOT NULL,
+	[PantallaId] [varchar](50) NOT NULL,
+	[Ver] [bit] NOT NULL,
+	[Editar] [bit] NOT NULL,
+	[Eliminar] [bit] NOT NULL,
+	[FechaTransaccion] [datetime] NOT NULL,
+	[DescripcionTransaccion] [varchar](50) NOT NULL,
+	[ModificadoPor] [varchar](20) NOT NULL,
+	[TipoTransaccion] [varchar](50) NOT NULL,
+	[TransaccionUId] [uniqueidentifier] NOT NULL,
+	[RowVersion] [timestamp] NOT NULL
 ) ON [PRIMARY]

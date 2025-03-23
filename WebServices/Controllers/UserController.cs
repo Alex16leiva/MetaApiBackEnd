@@ -53,11 +53,43 @@ namespace WebServices.Controllers
         }
 
         [Authorize]
-        [HttpPost("obtener-roles")]
-        public SearchResult<RolDTO> ObtenerRoles(GetRolRequest request)
+        [HttpGet("obtener-roles")]
+        public List<RolDTO> ObtenerRoles()
         {
-            var roles = _securityAppService.ObtenerRoles(request);
+            var roles = _securityAppService.ObtenerRoles();
             return roles;
+        }
+
+        [Authorize]
+        [HttpPost("crear-rol")]
+        public RolDTO CrearRol(EdicionRolRequest request)
+        {
+            var rol = _securityAppService.CrearRol(request);
+            return rol;
+        }
+
+        [Authorize]
+        [HttpPost("editar-rol")]
+        public RolDTO EditarRol(EdicionRolRequest request)
+        {
+            var rol = _securityAppService.EditarRol(request);
+            return rol;
+        }
+
+        [Authorize]
+        [HttpGet("obtener-pantalla")]
+        public List<PantallaDTO> ObtenerPantalla()
+        {
+            var pantallas = _securityAppService.ObtenerPantallas();
+            return pantallas;
+        }
+
+        [Authorize]
+        [HttpPost("edicion-permisos")]
+        public RolDTO EdicionPermisos(EdicionPermisosRequest request)
+        {
+            var rol = _securityAppService.EdicionPermisos(request);
+            return rol;
         }
     }
 }

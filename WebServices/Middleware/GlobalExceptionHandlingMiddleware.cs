@@ -1,7 +1,9 @@
 ﻿using Dominio.Core.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 using System.Net;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace WebServices.Middleware
 {
@@ -27,13 +29,19 @@ namespace WebServices.Middleware
 
                 context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
+                var valor = e.StackTrace.ValueOrEmpty();
+                string pattern = @"(?<=^).*?(?=\s+in C:\\)";
+                Match match = Regex.Match(valor, pattern, RegexOptions.Singleline);
+
+
                 ProblemDetails problem = new()
                 {
+                    
                     Status = (int)HttpStatusCode.InternalServerError,
                     Type = "Server Error",
                     Title = "Server Error",
                     Detail = e.Message.HasValue() ? e.Message : "An internal server has occurred",
-                    Instance = e.StackTrace?.ValueOrEmpty()
+                    Instance = match.Success ? match.Value : "Error"
                 };
 
                 string json = JsonSerializer.Serialize(problem);
