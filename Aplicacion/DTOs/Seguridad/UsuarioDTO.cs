@@ -14,6 +14,7 @@ namespace Aplicacion.DTOs.Seguridad
         public string? RolId { get; set; }
         public bool EditarContrasena { get; set; } = true;
         public bool Activo { get; set; }
+        public List<PermisosDTO> Permisos { get; set; }
 
         public string ValidarCampos()
         {

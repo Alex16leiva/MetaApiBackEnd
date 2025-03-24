@@ -149,14 +149,18 @@ namespace Aplicacion.Services
 
         public UsuarioDTO IniciarSesion(UserRequest request)
         {
-            var includes = new List<string> { "Rol" };
+            List<string> includes = ["Rol", "Rol.Permisos"];
 
             string passwordEncrypted = PasswordEncryptor.Encrypt(request?.Password);
 
-            Usuario usuario = _genericRepository.GetSingle<Usuario>(r => r.UsuarioId == request.UsuarioId, includes);
+            Usuario usuario = _genericRepository.GetSingle<Usuario>(r => r.UsuarioId == request.UsuarioId && r.Contrasena == passwordEncrypted, includes);
 
             if (usuario.IsNotNull())
             {
+                if (!usuario.Activo)
+                {
+                    return new UsuarioDTO { Message = $"Usuario {usuario.UsuarioId} esta desactivado" };
+                }
                 return new UsuarioDTO
                 {
                     Apellido = usuario.Apellido,
@@ -164,7 +168,8 @@ namespace Aplicacion.Services
                     RolId = usuario.RolId,
                     Token = _tokenService.Generate(usuario),
                     UsuarioAutenticado = true,
-                    UsuarioId = usuario.UsuarioId
+                    UsuarioId = usuario.UsuarioId,
+                    Permisos = MapPermisosDto(usuario.Rol?.Permisos)
                 };
             }
 
