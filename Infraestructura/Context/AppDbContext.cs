@@ -22,6 +22,7 @@ namespace Infraestructura.Context
         public virtual DbSet<MensajeDetalle> MensajeDetalle { get; set; }
         public virtual DbSet<Pantalla> Pantalla { get; set; }
         public virtual DbSet<Permisos> Permisos { get; set; }
+        public virtual DbSet<SesionLog> SesionLog { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new UsuarioMap());
@@ -30,6 +31,7 @@ namespace Infraestructura.Context
             modelBuilder.ApplyConfiguration(new MensajeDetalleMap());
             modelBuilder.ApplyConfiguration(new PantallaMap());
             modelBuilder.ApplyConfiguration(new PermisosMap());
+            modelBuilder.ApplyConfiguration(new SesionLogMap());
             base.OnModelCreating(modelBuilder);
         }
 

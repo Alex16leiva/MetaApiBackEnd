@@ -2,7 +2,6 @@
 using Aplicacion.DTOs.Seguridad;
 using Aplicacion.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebServices.Controllers
@@ -11,8 +10,8 @@ namespace WebServices.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly SecurityAplicationService _securityAppService;
-        public UserController(SecurityAplicationService securityAppService) 
+        private readonly SecurityApplicationService _securityAppService;
+        public UserController(SecurityApplicationService securityAppService) 
         {
             _securityAppService = securityAppService;
         }

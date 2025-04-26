@@ -58,8 +58,9 @@ RestClientFactory.SetCurrent(new HttpRestClientFactory());
 //builder.Services.AddTransient<IRestClient, HttpRestClient>();
 //builder.Services.AddTransient<IRestClientFactory, HttpRestClientFactory>();
 
-builder.Services.AddScoped<SecurityAplicationService>();
+builder.Services.AddScoped<SecurityApplicationService>();
 builder.Services.AddScoped<WhatsappAppService>();
+builder.Services.AddScoped<SesionLogApplicationService>();
 
 builder.Services.AddTransient<GlobalExceptionHandlingMiddleware>();
 

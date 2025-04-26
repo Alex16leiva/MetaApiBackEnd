@@ -16,12 +16,12 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Aplicacion.Services
 {
-    public class SecurityAplicationService : BaseDisposable
+    public class SecurityApplicationService : BaseDisposable
     {
         private readonly IGenericRepository<IDataContext> _genericRepository;
         private readonly ITokenService _tokenService;
         private readonly IMapper _mapper;
-        public SecurityAplicationService(IGenericRepository<IDataContext> genericRepository, ITokenService tokenService, IMapper mapper)
+        public SecurityApplicationService(IGenericRepository<IDataContext> genericRepository, ITokenService tokenService, IMapper mapper)
         {
             _genericRepository = genericRepository;
             _tokenService = tokenService;
@@ -36,7 +36,7 @@ namespace Aplicacion.Services
             {
                 return new UsuarioDTO
                 {
-                    Message = request.Usuario.Message,
+                    Message = mensajeValidacion,
                 };
             }
 
@@ -117,7 +117,7 @@ namespace Aplicacion.Services
             {
                 return new UsuarioDTO
                 {
-                    Message = request.Usuario.Message,
+                    Message = mensajeValidacion,
                 };
             }
 
