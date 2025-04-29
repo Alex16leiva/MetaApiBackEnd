@@ -11,6 +11,7 @@ namespace Infraestructura.Context.Mapping.Seguridad
             builder.HasKey(r => r.SesionId);
             builder.ToTable("SesionLog", "Seguridad");
             builder.Property(r => r.SesionId).HasColumnName("SesionId");
+            builder.Property(r => r.SesionUser).HasColumnName("SesionUser");
             builder.Property(r => r.UsuarioId).HasColumnName("UsuarioId");
             builder.Property(r => r.InicioSesion).HasColumnName("InicioSesion");
             builder.Property(r => r.CierreSesion).HasColumnName("CierreSesion");

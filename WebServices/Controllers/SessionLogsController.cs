@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace WebServices.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/sesionLog")]
     [ApiController]
     public class SessionLogsController : ControllerBase
     {
@@ -17,12 +17,19 @@ namespace WebServices.Controllers
         }
 
         [Authorize]
-        [HttpPost("log")]
+        [HttpPost("inicio")]
         public SesionLogDTO RegistrarSesionLog(SesionLogRequest request)
         {
             var response = _sesionLogApplicationService.RegistrarSesionLog(request);
             return response;
         }
 
+        [Authorize]
+        [HttpPost("fin")]
+        public SesionLogDTO TerminarSesionLog(SesionLogRequest request)
+        {
+            var response = _sesionLogApplicationService.TerminarSesionLog(request);
+            return response;
+        }
     }
 }

@@ -6,6 +6,7 @@ namespace Dominio.Context.Entidades.Seguridad
     {
         public int SesionId { get; set; }
         public required string UsuarioId { get; set; }
+        public required string SesionUser { get; set; }
         public required DateTime InicioSesion { get; set; }
         public required DateTime CierreSesion { get; set; }
         public int TiempoActivoSegundos { get; set; }
