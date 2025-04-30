@@ -1,6 +1,7 @@
 ﻿using Aplicacion.DTOs.Mensaje;
 using Aplicacion.Services.whatsapp;
 using Dominio.Context.Entidades.Mensaje;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
@@ -26,6 +27,7 @@ namespace WebServices.Controllers
             _hubContext = hubContext;
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public IActionResult VerifyWebhook()
         {
@@ -43,6 +45,7 @@ namespace WebServices.Controllers
             return Unauthorized();
         }
 
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> ReceiveMessage([FromBody] MetaMessageDto body)
         {
@@ -99,6 +102,8 @@ namespace WebServices.Controllers
             string fileUrl = message.Type == "image" || message.Type == "video"
                 ? await ObtenerArchivoDesdeMeta(message.Id)
                 : string.Empty;
+
+            
 
             await _hubContext.Clients.All.SendAsync(
                 "ReceiveMessage", message.From, message.Text.Body, fileUrl, message.Type);
