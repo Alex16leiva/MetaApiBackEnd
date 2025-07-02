@@ -1,0 +1,10 @@
+﻿services:
+  - type: web
+    name: MetaApiBackEnd
+    runtime: dotnet
+    buildCommand: dotnet publish -c Release -o out
+    startCommand: dotnet out/MetaApiBackEnd.dll
+    repo: https://github.com/Alex16leiva/MetaApiBackEnd
+    branch: master
+    plan: free
+    region: oregon
