@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using WebServices.Controllers;
 using WebServices.Jwtoken;
 using WebServices.Middleware;
+using WebServices.RegisterContainer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,28 +42,7 @@ builder.Services.AddCors(options =>
 });
 
 
-string conectionString = builder.Configuration.GetConnectionString("conectionDataBase");
-
-builder.Services.AddDbContext<AppDbContext>(
-        dbContextOption => dbContextOption.UseSqlServer(conectionString), ServiceLifetime.Transient
-    );
-
-builder.Services.AddTransient<IDataContext, AppDbContext>();
-builder.Services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-
-//Register Json Web Token
-builder.Services.AddTransient<ITokenService, JwtTokenService>();
-
-
-RestClientFactory.SetCurrent(new HttpRestClientFactory());
-//builder.Services.AddTransient<IRestClient, HttpRestClient>();
-//builder.Services.AddTransient<IRestClientFactory, HttpRestClientFactory>();
-
-builder.Services.AddScoped<SecurityApplicationService>();
-builder.Services.AddScoped<WhatsappAppService>();
-builder.Services.AddScoped<SesionLogApplicationService>();
-
-builder.Services.AddTransient<GlobalExceptionHandlingMiddleware>();
+builder.Services.RegisterApplicationServices(builder.Configuration);
 
 var app = builder.Build();
 
